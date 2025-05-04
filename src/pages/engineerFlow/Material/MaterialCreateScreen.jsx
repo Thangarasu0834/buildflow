@@ -7,7 +7,7 @@ import { classNames } from "./../../../utils/customHelpers";
 import { useDispatch, useSelector } from "react-redux";
 import { getVendorsAndSubcontractors } from "../../../store/actions/vendor/getvendoraction";
 import { fetchRoles } from "../../../store/actions/hr/designationaction";
-import { upsertBoq } from "../../../store/actions/Engineer/upsertboqaction";
+import { getNewBoqId, upsertBoq } from "../../../store/actions/Engineer/upsertboqaction";
 import Select from "react-dropdown-select";
 import MultipleSelect from "../../../components/DropDown/MultipleSelect";
 
@@ -20,10 +20,10 @@ const MaterialCreateScreen = () => {
   const dispatch = useDispatch();
   const { roles } = useSelector((state) => state.role);
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [selectedVendorId, setSelectedVendorId] = useState("");
-  const [boqId, setBoqId] = useState(0);
-  const [selectedApprover, setSelectedApprover] = useState([]);
+const [description, setDescription] = useState("");
+const [selectedVendorId, setSelectedVendorId] = useState("");
+
+
   const { vendors, loading, error } = useSelector((state) => state.vendor);
 
   const handleAddRow = () => {
@@ -47,6 +47,12 @@ const MaterialCreateScreen = () => {
       role.roleName
     )
   );
+
+
+  useEffect(() => {
+    dispatch(getNewBoqId());
+  }, [dispatch]);
+
 
   const handleInputChange = (index, event) => {
     const { name, value } = event.target;
@@ -134,6 +140,24 @@ const MaterialCreateScreen = () => {
       <h2 className="form-title">New BOQ</h2>
 
       <Form onSubmit={handleSubmit}>
+      <div className="row">
+      <div className="col-md-6">
+        <Form.Group className="mb-3">
+          <Form.Label className="text-black fs-5">
+            Title <span className="text-danger">*</span>
+          </Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="BOQ TITLE"
+            value={boqId || ""}
+            required
+            readOnly
+          />
+        </Form.Group>
+      </div>
+    
+
+          <div className="col-md-6">
         <div className="row">
           <div className="col-md-6">
             <Form.Group className="mb-3">
