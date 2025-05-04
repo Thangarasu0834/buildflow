@@ -116,7 +116,6 @@ const MaterialCreateScreen = () => {
     const getResponse = await dispatch(upsertBoq(data));
     if (getResponse?.payload?.success) {
       toast.success("BOQ created successfully.");
-      console.log("Form getResponse:", getResponse);
       // setTitle("");
       // setSelectedVendorId("");
       // setSelectedApprover([]);
@@ -131,7 +130,6 @@ const MaterialCreateScreen = () => {
         const ticketId = await dispatch(
           getticketbyidAction(ticketResponse?.data?.data?.ticketId)
         ).unwrap();
-        console.log("ticketId", ticketId);
         setTimeout(() => {
           navigate(
             `../engineerticketdetails/${ticketResponse?.data?.data?.ticketId}`,

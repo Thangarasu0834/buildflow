@@ -393,6 +393,8 @@ const App = () => {
           <Route path="aqsvendordetails" element={<AqsVendorDetails />} />
           <Route path="aqsvendorpricedetails" element={<AqsVendorPriceDetails />} />
           <Route path="aqssetting" element={<AqsSetting />} />
+          <Route path="engineermaterialview/:boqId" element={<EngineerMaterialView />} />
+
         </Route>
 
         {/* CEO ROUTES */}
@@ -495,8 +497,8 @@ const App = () => {
         <Route
           path="/purchasemanager"
           element={
-            <ProtectedRoute allowedRoleIds={[16, 17]}>
-              {renderLayout(16)}
+            <ProtectedRoute allowedRoleIds={[ 17]}>
+              {renderLayout(17)}
             </ProtectedRoute>
           }
         >
