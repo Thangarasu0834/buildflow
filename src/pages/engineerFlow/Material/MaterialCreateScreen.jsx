@@ -19,9 +19,9 @@ const MaterialCreateScreen = () => {
   const dispatch = useDispatch();
   const { roles } = useSelector((state) => state.role);
   const [title, setTitle] = useState("");
-const [description, setDescription] = useState("");
-const [selectedVendorId, setSelectedVendorId] = useState("");
-const { boqId } = useSelector((state) => state.boq);
+  const [selectedVendorId, setSelectedVendorId] = useState("");
+  const [selectedApprover, setSelectedApprover] = useState([]);
+  const { boqId } = useSelector((state) => state.boq);
 
 
 
@@ -102,11 +102,7 @@ const { boqId } = useSelector((state) => state.boq);
     dispatch(getVendorsAndSubcontractors());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (state?.state) {
-      setBoqId(state?.state?.boqId);
-    }
-  }, [state]);
+
 
 
   const selectOptions = approverRoles.map((v) => ({
@@ -149,7 +145,7 @@ const { boqId } = useSelector((state) => state.boq);
                 type="text"
                 placeholder="BOQ ID"
                 value={boqId}
-                onChange={(e) => setBoqId(e.target.value)}
+                // onChange={(e) => setBoqId(e.target.value)}
                 required
                 disabled
               />{" "}
@@ -210,14 +206,7 @@ const { boqId } = useSelector((state) => state.boq);
                 isSearchable={true}
                 placeholder={"Select Approver"}
               />
-              {/* <Form.Select style={{ backgroundColor: "#FFFFFF" }}>
-                <option>Select Approver</option>
-                {approverRoles.map((role) => (
-                  <option key={role.roleId} value={role.roleId}>
-                    {role.roleName}
-                  </option>
-                ))}
-              </Form.Select> */}
+          
             </Form.Group>
           </div>
         </div>
