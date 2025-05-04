@@ -13,6 +13,8 @@ import {
 } from "../../../store/actions/Engineer/upsertboqaction";
 import { toast } from "react-toastify";
 import { useTicket } from "../../../hooks/Ceo/useTicket";
+import { getAllEmployeesByRolesAction } from "../../../store/actions/Ceo/RoleBasedEmpAction";
+import { getticketbyidAction } from "../../../store/actions/Ceo/TicketCreateAction";
 
 const MaterialCreateScreen = () => {
   const navigate = useNavigate();
@@ -46,10 +48,27 @@ const MaterialCreateScreen = () => {
   };
 
   const approverRoles = roles.filter((role) =>
-    ["CEO", "Head Finance", "Managing Director", "Project Manager" , "Assistant QS"].includes(
-      role.roleName
-    )
+    [
+      "CEO",
+      "Head Finance",
+      "Managing Director",
+      "Project Manager",
+      "Assistant QS",
+    ].includes(role.roleName)
   );
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const result = await dispatch(getAllEmployeesByRolesAction()).unwrap();
+        console.log("Employee Details", result);
+      } catch (error) {
+        console.error("Failed to fetch employees:", error);
+      }
+    };
+
+    fetchEmployees();
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(getNewBoqId());
@@ -94,31 +113,38 @@ const MaterialCreateScreen = () => {
       ticketType: "string", // adjust this if you have an actual type
       vendorId: parseInt(selectedVendorId),
     };
-
     const getResponse = await dispatch(upsertBoq(data));
-    console.log("Form getResponse:", getResponse);
     if (getResponse?.payload?.success) {
       toast.success("BOQ created successfully.");
       console.log("Form getResponse:", getResponse);
       // setTitle("");
       // setSelectedVendorId("");
       // setSelectedApprover([]);
-      console.log("selectedApprover", selectedApprover);
-      const approvedByDev = selectedApprover.map((role) => {
-        return role.roleId;
-      });
-      console.log("approvedByDev", {
-        boqId: getResponse?.payload?.data?.boqId,
-        ticketType: "BOQ_APPROVAL",
-        assignTo: approvedByDev, // ✅ array of empIds
-        createdBy: empId?.empId,
-      });
       const ticketResponse = await createTicket({
         boqId: getResponse?.payload?.data?.boqId,
         ticketType: "BOQ_APPROVAL",
-        assignTo: approvedByDev, // ✅ array of empIds
+        assignTo: [1, 2, 6, 10, 11], // ✅ array of empIds
         createdBy: empId?.empId, // replace with actual logged-in user ID
       });
+      if (ticketResponse?.data?.success) {
+        toast.success("Ticket created successfully.");
+        const ticketId = await dispatch(
+          getticketbyidAction(ticketResponse?.data?.data?.ticketId)
+        ).unwrap();
+        console.log("ticketId", ticketId);
+        setTimeout(() => {
+          navigate(
+            `../engineerticketdetails/${ticketResponse?.data?.data?.ticketId}`,
+            {
+              state: {
+                ticket: ticketId,
+                from: "kanban",
+                boqId: getResponse?.payload?.data?.boqId,
+              },
+            }
+          );
+        }, 1000);
+      }
       console.log("ticketResponse_ticketResponse", ticketResponse);
       // setRows([{ itemName: "", unit: "", rate: "", quantity: "", total: "" }]);
     }
