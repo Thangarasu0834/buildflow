@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Table } from "react-bootstrap";
-import { json, useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
-import { classNames } from "./../../../utils/customHelpers";
 import { useDispatch, useSelector } from "react-redux";
 import { getVendorsAndSubcontractors } from "../../../store/actions/vendor/getvendoraction";
 import { fetchRoles } from "../../../store/actions/hr/designationaction";
 import MultipleSelect from "../../../components/DropDown/MultipleSelect";
-import { getNewBoqId, upsertBoq } from "../../../store/actions/Engineer/upsertboqaction";
+import {
+  getNewBoqId,
+  upsertBoq,
+} from "../../../store/actions/Engineer/upsertboqaction";
+import { toast } from "react-toastify";
+import { useTicket } from "../../../hooks/Ceo/useTicket";
 
 const MaterialCreateScreen = () => {
   const navigate = useNavigate();
-  const state = useLocation();
   const [rows, setRows] = useState([
     { itemName: "", unit: "", rate: "", quantity: "", total: "" },
   ]);
@@ -22,8 +25,7 @@ const MaterialCreateScreen = () => {
   const [selectedVendorId, setSelectedVendorId] = useState("");
   const [selectedApprover, setSelectedApprover] = useState([]);
   const { boqId } = useSelector((state) => state.boq);
-
-
+  const { createTicket } = useTicket();
 
   const { vendors, loading, error } = useSelector((state) => state.vendor);
 
@@ -44,16 +46,14 @@ const MaterialCreateScreen = () => {
   };
 
   const approverRoles = roles.filter((role) =>
-    ["CEO", "Head Finance", "Managing Director", "Project Manager"].includes(
+    ["CEO", "Head Finance", "Managing Director", "Project Manager" , "Assistant QS"].includes(
       role.roleName
     )
   );
 
-
   useEffect(() => {
     dispatch(getNewBoqId());
   }, [dispatch]);
-
 
   const handleInputChange = (index, event) => {
     const { name, value } = event.target;
@@ -70,15 +70,19 @@ const MaterialCreateScreen = () => {
     setRows(updatedRows);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
- 
-    let empId  = JSON.parse(localStorage.getItem("userData"));
+    let empId = JSON.parse(localStorage.getItem("userData"));
+    if (!selectedVendorId) {
+      toast.warn("Please select a vendor.");
+      return;
+    }
     const data = {
       empId: empId?.empId,
       boqId: 0,
       boqName: title,
-      boqDescription: boqId.toString(),
+      boqCode: boqId.toString(),
+      boqDescription: "",
       boqItems: rows.map((row) => ({
         boqItemsId: 0,
         itemName: row.itemName,
@@ -91,7 +95,33 @@ const MaterialCreateScreen = () => {
       vendorId: parseInt(selectedVendorId),
     };
 
-    dispatch(upsertBoq(data));
+    const getResponse = await dispatch(upsertBoq(data));
+    console.log("Form getResponse:", getResponse);
+    if (getResponse?.payload?.success) {
+      toast.success("BOQ created successfully.");
+      console.log("Form getResponse:", getResponse);
+      // setTitle("");
+      // setSelectedVendorId("");
+      // setSelectedApprover([]);
+      console.log("selectedApprover", selectedApprover);
+      const approvedByDev = selectedApprover.map((role) => {
+        return role.roleId;
+      });
+      console.log("approvedByDev", {
+        boqId: getResponse?.payload?.data?.boqId,
+        ticketType: "BOQ_APPROVAL",
+        assignTo: approvedByDev, // ✅ array of empIds
+        createdBy: empId?.empId,
+      });
+      const ticketResponse = await createTicket({
+        boqId: getResponse?.payload?.data?.boqId,
+        ticketType: "BOQ_APPROVAL",
+        assignTo: approvedByDev, // ✅ array of empIds
+        createdBy: empId?.empId, // replace with actual logged-in user ID
+      });
+      console.log("ticketResponse_ticketResponse", ticketResponse);
+      // setRows([{ itemName: "", unit: "", rate: "", quantity: "", total: "" }]);
+    }
   };
 
   useEffect(() => {
@@ -102,16 +132,11 @@ const MaterialCreateScreen = () => {
     dispatch(getVendorsAndSubcontractors());
   }, [dispatch]);
 
-
-
-
   const selectOptions = approverRoles.map((v) => ({
     ...v,
     value: v.roleName,
     label: v.roleName,
   }));
-
-
 
   return (
     <div className="container boq-form">
@@ -206,7 +231,6 @@ const MaterialCreateScreen = () => {
                 isSearchable={true}
                 placeholder={"Select Approver"}
               />
-          
             </Form.Group>
           </div>
         </div>
