@@ -809,7 +809,7 @@ const EngineerTicketDetails = () => {
               <h3 className="fs-18-500">Boq Details</h3>
               <button
                 className="btn border-primary px-4 border-2 mt-2"
-                onClick={() => get_boq_Ticket()}
+                onClick={() => get_boq_Ticket(ticket)}
               >
                 <GrAttachment />
               </button>
