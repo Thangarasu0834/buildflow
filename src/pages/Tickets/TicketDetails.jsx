@@ -27,14 +27,14 @@ import { AiOutlineUser } from "react-icons/ai";
 import { RiSaveFill } from "react-icons/ri";
 import { BsCalendar3 } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
-import { useTicket } from "../../../hooks/Ceo/useTicket";
+import { useTicket } from "../../hooks/Ceo/useTicket";
 import {
   getticketbyidAction,
   updateProjectApprovalAction,
-} from "../../../store/actions/Ceo/TicketCreateAction";
-import { useDepartments } from "../../../hooks/Ceo/useDepartments";
-import { createTicketDetailsAction } from "../../../store/actions/masterAction";
-import { createTicketsDetailsSelector } from "../../../store/selector/masterSelector";
+} from "../../store/actions/Ceo/TicketCreateAction";
+import { useDepartments } from "../../hooks/Ceo/useDepartments";
+import { createTicketDetailsAction } from "../../store/actions/masterAction";
+import { createTicketsDetailsSelector } from "../../store/selector/masterSelector";
 import { GrAttachment } from "react-icons/gr";
 
 const EngineerTicketDetails = () => {
@@ -596,7 +596,7 @@ const EngineerTicketDetails = () => {
       return;
     }
   
-    navigate(`../boqDetails/${ticket.transaction_id}`);
+    navigate(`../engineermaterialview/${ticket.transaction_id}`);
   };
   return (
     <Container fluid className="">

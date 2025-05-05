@@ -569,29 +569,9 @@ const EngineerTicketDetails = () => {
     setShowToast(true);
   };
 
-  // Format date for display
-  const formatDate = (dateString) => {
-    if (!dateString) return "Not set";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  };
-
-  // Get initials from name
-  const getInitials = (name) => {
-    if (!name) return "NA";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
-  };
-
-  const get_boq_Ticket = () => {
-    navigate(`../engineermaterialview/${location?.state?.boqId}`);
+  // Save changes
+  const handleSave = () => {
+    showToastNotification('All changes saved successfully');
   };
   return (
     <Container fluid className="">
@@ -796,18 +776,6 @@ const EngineerTicketDetails = () => {
                   </div>
                 </Form>
               </div>
-            </div>
-
-            {/* view material details (BOQ) */}
-
-            <div className="py-3">
-              <h3 className="fs-18-500">Boq Details</h3>
-              <button
-                className="btn border-primary px-4 border-2 mt-2"
-                onClick={() => get_boq_Ticket()}
-              >
-                <GrAttachment />
-              </button>
             </div>
 
             {/* Tabs */}
